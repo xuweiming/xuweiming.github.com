@@ -6,22 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>ArrayList源码分析 | 新手村</title>
+  <title>使用openoffice转成pdf | 新手村</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="集合框架总览基于jdk1.8源码 ArrayList成员变量123456 private static final int DEFAULT_CAPACITY = 10;//默认初始化大小是10个 private static final Object[] EMPTY_ELEMENTDATA = &amp;#123;&amp;#125;; //空对象标志 private static final Object[]">
-<meta name="keywords" content="jdk源码分析">
+  <meta name="description" content="背景接公司一个需求是需要实现word和excel的在线预览，百度了一下，基本上是使用openoffice转成pdf格式文件然后传到前端进行预览，做完这个需求之后进行记录">
+<meta name="keywords" content="杂记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ArrayList源码分析">
-<meta property="og:url" content="http://yoursite.com/2019/06/14/ArrayList源码分析/index.html">
+<meta property="og:title" content="使用openoffice转成pdf">
+<meta property="og:url" content="http://yoursite.com/2019/07/19/使用openoffice转成pdf/index.html">
 <meta property="og:site_name" content="新手村">
-<meta property="og:description" content="集合框架总览基于jdk1.8源码 ArrayList成员变量123456 private static final int DEFAULT_CAPACITY = 10;//默认初始化大小是10个 private static final Object[] EMPTY_ELEMENTDATA = &amp;#123;&amp;#125;; //空对象标志 private static final Object[]">
+<meta property="og:description" content="背景接公司一个需求是需要实现word和excel的在线预览，百度了一下，基本上是使用openoffice转成pdf格式文件然后传到前端进行预览，做完这个需求之后进行记录">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://preview.cloud.189.cn/image/imageAction?param=3802B43B2CA4F934C249E296208441482F579CA12B5EFC3C64ACA9B2A4E628A3AAA9DAE15059FB47ACEB04929AEF172C4A7801648978DD08FC494ACC2B9BE16CBAD7A70FCCFDBF5F813DFF94367BE2AB0E34EBCCF33D850F86D3CBC3">
-<meta property="og:updated_time" content="2019-06-20T08:37:53.259Z">
+<meta property="og:updated_time" content="2019-07-19T09:36:30.364Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ArrayList源码分析">
-<meta name="twitter:description" content="集合框架总览基于jdk1.8源码 ArrayList成员变量123456 private static final int DEFAULT_CAPACITY = 10;//默认初始化大小是10个 private static final Object[] EMPTY_ELEMENTDATA = &amp;#123;&amp;#125;; //空对象标志 private static final Object[]">
-<meta name="twitter:image" content="https://preview.cloud.189.cn/image/imageAction?param=3802B43B2CA4F934C249E296208441482F579CA12B5EFC3C64ACA9B2A4E628A3AAA9DAE15059FB47ACEB04929AEF172C4A7801648978DD08FC494ACC2B9BE16CBAD7A70FCCFDBF5F813DFF94367BE2AB0E34EBCCF33D850F86D3CBC3">
+<meta name="twitter:title" content="使用openoffice转成pdf">
+<meta name="twitter:description" content="背景接公司一个需求是需要实现word和excel的在线预览，百度了一下，基本上是使用openoffice转成pdf格式文件然后传到前端进行预览，做完这个需求之后进行记录">
   
     <link rel="alternative" href="/atom.xml" title="新手村" type="application/atom+xml">
   
@@ -179,34 +177,27 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-ArrayList源码分析" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-使用openoffice转成pdf" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      ArrayList源码分析
+      使用openoffice转成pdf
     </h1>
   
 
         
-        <a href="/2019/06/14/ArrayList源码分析/" class="archive-article-date">
-  	<time datetime="2019-06-14T06:38:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-14</time>
+        <a href="/2019/07/19/使用openoffice转成pdf/" class="archive-article-date">
+  	<time datetime="2019-07-19T09:30:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="集合框架总览"><a href="#集合框架总览" class="headerlink" title="集合框架总览"></a>集合框架总览</h2><p><img src="https://preview.cloud.189.cn/image/imageAction?param=3802B43B2CA4F934C249E296208441482F579CA12B5EFC3C64ACA9B2A4E628A3AAA9DAE15059FB47ACEB04929AEF172C4A7801648978DD08FC494ACC2B9BE16CBAD7A70FCCFDBF5F813DFF94367BE2AB0E34EBCCF33D850F86D3CBC3" alt="image"><br><em>基于jdk1.8源码</em></p>
-<h2 id="ArrayList成员变量"><a href="#ArrayList成员变量" class="headerlink" title="ArrayList成员变量"></a>ArrayList成员变量</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> private static final int DEFAULT_CAPACITY = 10;//默认初始化大小是10个</span><br><span class="line"> private static final Object[] EMPTY_ELEMENTDATA = &#123;&#125;; //空对象标志</span><br><span class="line"> private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = &#123;&#125;;//空对象标志</span><br><span class="line"> transient Object[] elementData;//使用的是Object对象数组进行存储值</span><br><span class="line">private int size;//大小</span><br><span class="line"> private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;//最大容量</span><br></pre></td></tr></table></figure>
-
-<h2 id="扩容策略"><a href="#扩容策略" class="headerlink" title="扩容策略"></a>扩容策略</h2><p>代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">private void grow(int minCapacity) &#123;</span><br><span class="line">       // overflow-conscious code</span><br><span class="line">       int oldCapacity = elementData.length;</span><br><span class="line">       int newCapacity = oldCapacity + (oldCapacity &gt;&gt; 1);</span><br><span class="line">       if (newCapacity - minCapacity &lt; 0)</span><br><span class="line">           newCapacity = minCapacity;</span><br><span class="line">       if (newCapacity - MAX_ARRAY_SIZE &gt; 0)</span><br><span class="line">           newCapacity = hugeCapacity(minCapacity);</span><br><span class="line">       // minCapacity is usually close to size, so this is a win:</span><br><span class="line">       elementData = Arrays.copyOf(elementData, newCapacity);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到扩容是原来的大小加上原来的大小右移一位，也就是1.5倍扩容的方式 </p>
-<h2 id="其它操作"><a href="#其它操作" class="headerlink" title="其它操作"></a>其它操作</h2><p>代码里面大量使用了 System.arraycopy方法进行数组大小的变化操作<br>其它的操作添加，修改删除，查询操作都是正常的数组操作</p>
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接公司一个需求是需要实现word和excel的在线预览，百度了一下，基本上是使用openoffice转成pdf格式文件然后传到前端进行预览，做完这个需求之后进行记录</p>
 
       
 
@@ -241,7 +232,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">jdk源码分析</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">杂记</a>
         		</li>
       		
 		</ul>
@@ -253,7 +244,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/jdk源码分析//" class="article-tag-list-link color3">jdk源码分析</a>
+        			<a href="/categories/杂记//" class="article-tag-list-link color3">杂记</a>
         		</li>
       		
 		</ul>
@@ -308,7 +299,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/06/14/ArrayList源码分析/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/19/使用openoffice转成pdf/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -322,18 +313,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/06/19/Vector源码分析/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          Vector源码分析
-        
-      </div>
-    </a>
   
-  
-    <a href="/2019/06/11/小狗钱钱1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">小狗钱钱1</div>
+    <a href="/2019/07/16/mybatis学习/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">mybatis学习</div>
       <i class="icon-circle-right"></i>
     </a>
   
