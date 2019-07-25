@@ -178,6 +178,129 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-mybatis动态SQL" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/25/mybatis动态SQL/">mybatis动态SQL</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/25/mybatis动态SQL/" class="archive-article-date">
+  	<time datetime="2019-07-25T02:44:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>主要包括以下标签:</p>
+<ul>
+<li>if</li>
+<li>choose(when、otherwise)</li>
+<li>trim(where、set)</li>
+<li>foreach</li>
+<li>bind</li>
+</ul>
+<h1 id="if标签"><a href="#if标签" class="headerlink" title="if标签"></a>if标签</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;selectAll&quot; resultType=&quot;Country&quot;&gt;</span><br><span class="line">        select id,countryname,countrycode</span><br><span class="line">        from country</span><br><span class="line">        where 1 = 1</span><br><span class="line">        &lt;if test=&quot;countryname!=null and countryname !=&apos;&apos;&quot;&gt;</span><br><span class="line">            and countryname like concat(&apos;%&apos;,#&#123;countryname&#125;,&apos;%&apos;)</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">    &lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<p>if标签有一个test属性，里面写一个符合OGNL的表达式，返回的结果是true或者false<br>多个条件使用 and 或者 or进行连接</p>
+<h1 id="chose用法"><a href="#chose用法" class="headerlink" title="chose用法"></a>chose用法</h1><p>chose的用法其实跟if差不多</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id =&quot;selectByidOrUserName&quot; resultType=&quot;tk.mybat is.simple.m0del.SysUser&quot;&gt;</span><br><span class="line">select  id ,</span><br><span class="line">username userName ,</span><br><span class="line">userpassword userPassword,</span><br><span class="line">useremail userEmail ,</span><br><span class="line">userinfo userinfo ,</span><br><span class="line">head_img  headimg ,</span><br><span class="line">createtime createTime</span><br><span class="line">from sys_user</span><br><span class="line">where  1 = 1</span><br><span class="line">&lt;choose&gt;</span><br><span class="line">&lt;when test=&quot;id!=null&quot;&gt;</span><br><span class="line">and  id=  #&#123;id&#125;</span><br><span class="line">&lt;/when&gt;</span><br><span class="line">&lt;when test=” userName!=null and userName !=”” &gt;</span><br><span class="line">and  username =  #&#123;userName&#125;</span><br><span class="line">&lt;/when&gt;</span><br><span class="line">&lt;otherwise&gt;</span><br><span class="line">and  1 = 2</span><br><span class="line">&lt;/otherwise&gt;</span><br><span class="line">&lt;/choose&gt;</span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="where-set-trim标签用法"><a href="#where-set-trim标签用法" class="headerlink" title="where set trim标签用法"></a>where set trim标签用法</h1><h2 id="where标签"><a href="#where标签" class="headerlink" title="where标签"></a>where标签</h2><p>where标签的作用是，如果该标签包含的元素中有返回值，就插入一个where，如果where后面的字符串是以AND和OR开头，就将他们剔除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;selectAll&quot; resultType=&quot;Country&quot;&gt;</span><br><span class="line">        select id,countryname,countrycode</span><br><span class="line">        from country</span><br><span class="line">        &lt;where&gt;</span><br><span class="line">            &lt;if test=&quot;countryname!=null and countryname !=&apos;&apos;&quot;&gt;</span><br><span class="line">                and countryname like concat(&apos;%&apos;,#&#123;countryname&#125;,&apos;%&apos;)</span><br><span class="line">            &lt;/if&gt;</span><br><span class="line">        &lt;/where&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="set-标签"><a href="#set-标签" class="headerlink" title="set 标签"></a>set 标签</h2><p>其实跟where标签差不多，只是改成了添加set字符串，如果是以逗号结尾的就把他的剔除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id=&quot;updateByidSelective&quot;&gt;</span><br><span class="line">    update sys_user</span><br><span class="line">    &lt;set&gt;</span><br><span class="line">        &lt;if  test=&quot;userName != null and userName !=&quot;&quot;&gt;</span><br><span class="line">            username=#&#123;userName&#125;,</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        &lt;if test =&quot;userPassword  !=  null  and  userPassword  != &apos;&apos;&quot; &gt;</span><br><span class="line">            user  password=  #&#123;userPassword&#125; ,</span><br><span class="line">        &lt;/ if &gt;</span><br><span class="line">        &lt;if  test =&quot;userEmail  !=  null  and  userEmail  != &apos;&apos;&quot; &gt;</span><br><span class="line">            useremail  =  #&#123;userEmail&#125; ,</span><br><span class="line">        &lt;/ if &gt;</span><br><span class="line">        &lt;i f  test =&quot;userinfo  !=  null  and  userinfo  !=&apos;&apos;&quot;&gt;</span><br><span class="line">            userinfo  =  #&#123;userinfo&#125;,</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        &lt;if  test =&quot;headimg  !=  null&quot; &gt;</span><br><span class="line">             head_img  =  #&#123;headimg,  jdbcType=BLOB&#125;,</span><br><span class="line">        &lt;/i f &gt;</span><br><span class="line">        &lt;if  test =&quot;createTime  !=  null&quot;&gt;</span><br><span class="line">             create_time  =  #&#123;createTime,  jdbcType=TIMESTAMP&#125;,</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        id  = #  &#123;id&#125; ,</span><br><span class="line">    &lt;/set&gt;</span><br><span class="line">    where  id  =  #&#123;id&#125;</span><br><span class="line">&lt;/ update&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="trim标签"><a href="#trim标签" class="headerlink" title="trim标签"></a>trim标签</h2><p>where和set标签都可以通过trim标签来实现，并且在底层就是通过TrimSqlNode实现的<br>where标签对应trim的实现如下。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">select * from user </span><br><span class="line"></span><br><span class="line">　　&lt;trim prefix=&quot;WHERE&quot; prefixoverride=&quot;AND |OR&quot;&gt;</span><br><span class="line"></span><br><span class="line">　　　　&lt;if test=&quot;name != null and name.length()&gt;0&quot;&gt; AND name=#&#123;name&#125;&lt;/if&gt;</span><br><span class="line"></span><br><span class="line">　　　　&lt;if test=&quot;gender != null and gender.length()&gt;0&quot;&gt; AND gender=#&#123;gender&#125;&lt;/if&gt;</span><br><span class="line"></span><br><span class="line">　　&lt;/trim&gt;</span><br></pre></td></tr></table></figure>
+
+<p>set标签对就trim实现如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;trim prefix=&quot;SET&quot; prefixOverrides=&quot;,&quot;&gt;</span><br><span class="line">···</span><br><span class="line">&lt;/trim&gt;</span><br></pre></td></tr></table></figure>
+
+<p>trim标签有四个属性</p>
+<ul>
+<li>prefix：添加前缀</li>
+<li>prefixoverride：去除什么前缀</li>
+<li>suffix: 添加后缀</li>
+<li>suffixoverride：去除什么后缀</li>
+</ul>
+<h1 id="foreach标签"><a href="#foreach标签" class="headerlink" title="foreach标签"></a>foreach标签</h1><p>迭代list   index值是下标</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT * </span><br><span class="line">FROM &lt;tableName&gt; </span><br><span class="line">WHERE &lt;ColumnName&gt; IN </span><br><span class="line">&lt;foreach collection=&quot;list&quot; index=&quot;index&quot; item=&quot;item&quot; open=&quot;(&quot; separator=&quot;,&quot; close=&quot;)&quot;&gt;</span><br><span class="line">    #&#123;item&#125;</span><br><span class="line">&lt;/foreach&gt;</span><br></pre></td></tr></table></figure>
+
+<p>迭代map  index值是key item是val</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id=&quot;updateOne&quot;&gt;</span><br><span class="line">        update country</span><br><span class="line">        set</span><br><span class="line">        &lt;foreach collection=&quot;parmas&quot; item=&quot;val&quot; index=&quot;key&quot; separator=&quot;,&quot;&gt;</span><br><span class="line">            $&#123;key&#125; = #&#123;val&#125;</span><br><span class="line">        &lt;/foreach&gt;</span><br><span class="line">        where id = #&#123;parmas.id&#125;</span><br><span class="line">    &lt;/update&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="bind标签"><a href="#bind标签" class="headerlink" title="bind标签"></a>bind标签</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id=&quot;updateOne&quot;&gt;</span><br><span class="line">        &lt;bind name=&quot;id&quot; value=&quot;parmas.id&quot;/&gt;</span><br><span class="line">        update country</span><br><span class="line">        set</span><br><span class="line">        &lt;foreach collection=&quot;parmas&quot; item=&quot;val&quot; index=&quot;key&quot; separator=&quot;,&quot;&gt;</span><br><span class="line">            $&#123;key&#125; = #&#123;val&#125;</span><br><span class="line">        &lt;/foreach&gt;</span><br><span class="line">        where id = #&#123;id&#125;</span><br><span class="line">&lt;/update&gt;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">mybatis框架</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/mybatis框架//" class="article-tag-list-link color5">mybatis框架</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/25/mybatis动态SQL/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-使用openoffice转成pdf" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1070,98 +1193,6 @@
 
 
   
-    <article id="post-ArrayList源码分析" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/14/ArrayList源码分析/">ArrayList源码分析</a>
-    </h1>
-  
-
-        
-        <a href="/2019/06/14/ArrayList源码分析/" class="archive-article-date">
-  	<time datetime="2019-06-14T06:38:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="集合框架总览"><a href="#集合框架总览" class="headerlink" title="集合框架总览"></a>集合框架总览</h2><p><img src="https://preview.cloud.189.cn/image/imageAction?param=3802B43B2CA4F934C249E296208441482F579CA12B5EFC3C64ACA9B2A4E628A3AAA9DAE15059FB47ACEB04929AEF172C4A7801648978DD08FC494ACC2B9BE16CBAD7A70FCCFDBF5F813DFF94367BE2AB0E34EBCCF33D850F86D3CBC3" alt="image"><br><em>基于jdk1.8源码</em></p>
-<h2 id="ArrayList成员变量"><a href="#ArrayList成员变量" class="headerlink" title="ArrayList成员变量"></a>ArrayList成员变量</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> private static final int DEFAULT_CAPACITY = 10;//默认初始化大小是10个</span><br><span class="line"> private static final Object[] EMPTY_ELEMENTDATA = &#123;&#125;; //空对象标志</span><br><span class="line"> private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = &#123;&#125;;//空对象标志</span><br><span class="line"> transient Object[] elementData;//使用的是Object对象数组进行存储值</span><br><span class="line">private int size;//大小</span><br><span class="line"> private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;//最大容量</span><br></pre></td></tr></table></figure>
-
-<h2 id="扩容策略"><a href="#扩容策略" class="headerlink" title="扩容策略"></a>扩容策略</h2><p>代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">private void grow(int minCapacity) &#123;</span><br><span class="line">       // overflow-conscious code</span><br><span class="line">       int oldCapacity = elementData.length;</span><br><span class="line">       int newCapacity = oldCapacity + (oldCapacity &gt;&gt; 1);</span><br><span class="line">       if (newCapacity - minCapacity &lt; 0)</span><br><span class="line">           newCapacity = minCapacity;</span><br><span class="line">       if (newCapacity - MAX_ARRAY_SIZE &gt; 0)</span><br><span class="line">           newCapacity = hugeCapacity(minCapacity);</span><br><span class="line">       // minCapacity is usually close to size, so this is a win:</span><br><span class="line">       elementData = Arrays.copyOf(elementData, newCapacity);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到扩容是原来的大小加上原来的大小右移一位，也就是1.5倍扩容的方式 </p>
-<h2 id="其它操作"><a href="#其它操作" class="headerlink" title="其它操作"></a>其它操作</h2><p>代码里面大量使用了 System.arraycopy方法进行数组大小的变化操作<br>其它的操作添加，修改删除，查询操作都是正常的数组操作</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">jdk源码分析</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/jdk源码分析//" class="article-tag-list-link color3">jdk源码分析</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/06/14/ArrayList源码分析/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1263,11 +1294,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">杂记</a>
+                <a href="javascript:void(0)" class="js-tag color5">mybatis框架</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">读书笔记</a>
+                <a href="javascript:void(0)" class="js-tag color3">杂记</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1275,7 +1306,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">mybatis框架</a>
+                <a href="javascript:void(0)" class="js-tag color5">读书笔记</a>
               </li>
             
             <div class="clearfix"></div>
