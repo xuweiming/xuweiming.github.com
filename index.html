@@ -324,6 +324,17 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;insert id=&quot;insertOne&quot;&gt;</span><br><span class="line">        insert into country(countryname,countrycode) values (#&#123;countryname&#125;,#&#123;countrycode&#125;)</span><br><span class="line">        &lt;selectKey keyColumn=&quot;id&quot; keyProperty=&quot;id&quot; resultType=&quot;long&quot; order=&quot;AFTER&quot;&gt;</span><br><span class="line">            select SEQ_ID.nextval from dual</span><br><span class="line">        &lt;/selectKey&gt;</span><br><span class="line">    &lt;/insert&gt;</span><br></pre></td></tr></table></figure>
 
 <p>其它数据库，参考如下<br><img src="https://preview.cloud.189.cn/image/imageAction?param=70B054241A257AA09A8025E7A592981766529033828807C098E2A4A217D6BC3A94B7141A8FC251FBC406565C5C9CE98188FF76C0E1E6292D91BFE3ED05CE9BD65ABA83685A1EBD00228C29807B99D6E5F664A6FB54CAB095C13A772D" alt="avatar"></p>
+<h2 id="delete标签"><a href="#delete标签" class="headerlink" title="delete标签"></a>delete标签</h2><p>其实差不多</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;delete id=&quot;deleteById&quot;&gt;</span><br><span class="line">    delete  from sys_user where id=#&#123;id&#125;</span><br><span class="line">&lt;/delete&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="多个接口参数"><a href="#多个接口参数" class="headerlink" title="多个接口参数"></a>多个接口参数</h1><p>只使用xml不使用mapper接口类加载到mybatis配置文件的时候，XML中有多个参数的时候取值方式不一样，XML中多个参数的时候使用下标进行取值0，1或者param1和param2这样的取值方式<br>使用mapper接口类的方式加载到mybatis的时候，多个参数可以使用@Param注解，给参数定义别名</p>
+<h1 id="注解形式的mybatis开发"><a href="#注解形式的mybatis开发" class="headerlink" title="注解形式的mybatis开发"></a>注解形式的mybatis开发</h1><p> 主要在mapper接口中使用4个注解@Select,@Insert,@Update,@Delete<br> @Results注解配置映射<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Results(id=&quot;roleResultMap&quot;,value=&#123;</span><br><span class="line">    @Result(property  = ” i d ”, column  = ” id ”, id  =  true) ,</span><br><span class="line">@Result(property  = ” roleName ”, column  =” role  name ”),</span><br><span class="line">@Result(property  =” enabled ”, column  = ” enabled ”),</span><br><span class="line">@Result(property  = ” createBy ”, column  = ” create_by ”),</span><br><span class="line">@Result(property  = ” createTime ”, column  =  &quot; create_time  ”)</span><br><span class="line">&#125;)</span><br><span class="line">@Selec t  (” s elect  id,role  name,  enabled ,  create  by ,  create  time</span><br><span class="line">from  sys_role  where  id  =  #&#123;id )”)</span><br><span class="line">SysRole  selectBy id2(Long  id);</span><br></pre></td></tr></table></figure></p>
+<p> id可以在别的方法上引用这个resultMap</p>
+<h2 id="返回自增主键"><a href="#返回自增主键" class="headerlink" title="返回自增主键"></a>返回自增主键</h2> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Insert  (&#123;” insert  into  sys_role  (role_name,  enabled,  create_by,  create_  time )”,</span><br><span class="line">” values(#&#123;roleName&#125;,  #&#123;enabled&#125;,  #&#123;createBy &#125;,”,</span><br><span class="line">”#&#123; createTime , jdbcType=TIMESTAMP &#125;)”&#125;)</span><br><span class="line">@Options(useGeneratedKeys  =true,  keyProperty  =” id ”)</span><br><span class="line">int  insert2(SysRole  sysRole);</span><br></pre></td></tr></table></figure>
+
+<h2 id="返回非自增主键"><a href="#返回非自增主键" class="headerlink" title="返回非自增主键"></a>返回非自增主键</h2> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> @Insert  (&#123;” insert  into  sys_role  &#123;role_name,  enabled,  create_by,  create  time ) ”,</span><br><span class="line">” values &#123;#&#123;r oleName&#125; ,  #&#123;enabled&#125;,  #&#123;createBy &#125;,”,</span><br><span class="line">”#&#123; createTime ,  jdbcType=  TIMESTAMP &#125;) ” &#125;&#125;</span><br><span class="line">@SelectKey&#123;statement  =” SELECT LAST INSERT ID  &#123;)”,</span><br><span class="line">keyProperty  =” id ”,</span><br><span class="line">resultType  =  Long.class ,</span><br><span class="line">before  =  false)</span><br><span class="line">int  insert3&#123;SysRole  sysRole);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Provider注解"><a href="#Provider注解" class="headerlink" title="Provider注解"></a>Provider注解</h2><p> Mybatis提供了4种provider注解:@SelectProvider、@InsertProvider、@UpdateProvider和DeleteProvider，分别实现查询、插入、更新和删除  </p>
 
       
 
@@ -1252,15 +1263,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">杂记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">读书笔记</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">随笔</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">杂记</a>
               </li>
              
               <li class="article-tag-list-item">
