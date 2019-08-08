@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="新手村">
 <meta property="og:description" content="高级结果查询一对一映射使用resultMap配置一对一映射,取别名进行映射比如sysUser类有一个sysRole类的role属性，查询的时候可以给role表查询出来的列，取一个别名，role.**这样，mybatis会自动封装到这个role属性对像里面 使用resultMap的association标签配置一对一映射123456&amp;lt;resultMap id=&amp;quot;sysRole&amp;quo">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-05T06:17:44.682Z">
+<meta property="og:updated_time" content="2019-08-06T09:09:43.167Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mybatis高级查询">
 <meta name="twitter:description" content="高级结果查询一对一映射使用resultMap配置一对一映射,取别名进行映射比如sysUser类有一个sysRole类的role属性，查询的时候可以给role表查询出来的列，取一个别名，role.**这样，mybatis会自动封装到这个role属性对像里面 使用resultMap的association标签配置一对一映射123456&amp;lt;resultMap id=&amp;quot;sysRole&amp;quo">
@@ -212,7 +212,8 @@
 <h2 id="鉴别器映射"><a href="#鉴别器映射" class="headerlink" title="鉴别器映射"></a>鉴别器映射</h2><p>根据根据不同的值返回不同的resultMap，有些时候需要查询更多，有些，则不需要，就可以使用这种鉴别器映射进行管理</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;resultMap id=&quot;treeMap&quot; type=&quot;Country&quot;&gt;</span><br><span class="line">       &lt;discriminator javaType=&quot;int&quot; column=&quot;enabled&quot;&gt;</span><br><span class="line">           &lt;case value=&quot;1&quot; resultMap=&quot;xxx&quot;&gt;&lt;/case&gt;</span><br><span class="line">           &lt;case value=&quot;0&quot; resultMap=&quot;xxx&quot;&gt;&lt;/case&gt;</span><br><span class="line">       &lt;/discriminator&gt;</span><br><span class="line">   &lt;/resultMap&gt;</span><br></pre></td></tr></table></figure>
 
-<h2 id="存储过程"><a href="#存储过程" class="headerlink" title="存储过程"></a>存储过程</h2>
+<h2 id="存储过程"><a href="#存储过程" class="headerlink" title="存储过程"></a>存储过程</h2><p>在mybatis调用存储过程很简单，只需要把相应的标签上的statementType值为CALLABLE，因为mybatis的存储过程调用是不支持二缓存的，所以把userCache设置为false避免出错 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;selectUserById&quot; statementType=&quot;CALLABLE&quot; useCache=&quot;false&quot; resultMap=&quot;userMap&quot;&gt;</span><br><span class="line">      &#123;call select_user_page(#&#123;userName,mode=IN&#125;,</span><br><span class="line">          #&#123;offset,mode=IN&#125;,</span><br><span class="line">          #&#123;limit,mode=IN&#125;,</span><br><span class="line">          #&#123;total,mode=out,jdbcType=BIGINT&#125;)</span><br><span class="line">      &#125;</span><br><span class="line">  &lt;/select&gt;</span><br></pre></td></tr></table></figure>
       
 
       
@@ -326,6 +327,15 @@
 
   
 <nav id="article-nav">
+  
+    <a href="/2019/08/06/mybatis拦截器开发/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          mybatis拦截器开发
+        
+      </div>
+    </a>
   
   
     <a href="/2019/07/25/mybatis动态SQL/" id="article-nav-older" class="article-nav-link-wrap">
