@@ -178,6 +178,200 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-动态代理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/20/动态代理/">动态代理</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/20/动态代理/" class="archive-article-date">
+  	<time datetime="2019-08-20T11:55:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h1><p>代理分为静态代理和动态代理，静态代理就是再封装一个类，调用目标对像方法，然后调用前后做一些操作，这种静态代理的方式，目标对象变了，代理类也要跟着变，而使用动态代理的方法就可以比较好解决这些问题</p>
+<h1 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h1><p>动态代理的实现有两种：JDK动态代理和CGLIB动态代理</p>
+<h2 id="JDK动态代理实现代码"><a href="#JDK动态代理实现代码" class="headerlink" title="JDK动态代理实现代码"></a>JDK动态代理实现代码</h2><ol>
+<li>写一个代理类实现InvocationHandler接口类重写invoke方法</li>
+<li>获取代理类<br>代码如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import java.lang.reflect.InvocationHandler;</span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line">import java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line">public class DynamicProxy implements InvocationHandler &#123;</span><br><span class="line">    private Object target;</span><br><span class="line">    public DynamicProxy(Object target) &#123;</span><br><span class="line">        this.target = target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</span><br><span class="line">        System.out.println(&quot;before方法插入&quot;);</span><br><span class="line">        Object result = method.invoke(target, args);</span><br><span class="line">        System.out.println(&quot;after方法插入&quot;);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public &lt;T&gt; T getProxy() &#123;</span><br><span class="line">        return (T) Proxy.newProxyInstance(</span><br><span class="line">                target.getClass().getClassLoader(),</span><br><span class="line">                target.getClass().getInterfaces(),</span><br><span class="line">                this</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>调用方法如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Hello hello = new HelloImpl();</span><br><span class="line">DynamicProxy dynamicProxy = new DynamicProxy(hello);</span><br><span class="line">Hello proxy = dynamicProxy.getProxy();</span><br></pre></td></tr></table></figure>
+
+<p>JDK的动态代理只能基于接口类进行代理</p>
+<p>##CGLIB动态代理<br>CGLIB代理没有限制只能代理接口</p>
+<ol>
+<li>引入cglib相关包</li>
+<li>编写代理类实现MethodInterceptor接口类，重写intercept方法</li>
+<li>获取代理类</li>
+<li>调用<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">maven引进依赖:</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;cglib&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;cglib&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;3.3.0&lt;/version&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import net.sf.cglib.proxy.Enhancer;</span><br><span class="line">import net.sf.cglib.proxy.MethodInterceptor;</span><br><span class="line">import net.sf.cglib.proxy.MethodProxy;</span><br><span class="line"></span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line">//可以把这个类改成单例的</span><br><span class="line">public class CgLibProxy implements MethodInterceptor &#123;</span><br><span class="line">    public &lt;T&gt; T getProxy(Class&lt;T&gt; clazz) &#123;</span><br><span class="line">        return (T) Enhancer.create(clazz,this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable &#123;</span><br><span class="line">        System.out.println(&quot;before操作&quot;);</span><br><span class="line">        Object result = methodProxy.invokeSuper(o, objects);</span><br><span class="line">        System.out.println(&quot;after操作&quot;);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CgLibProxy cgLibProxy = new CgLibProxy();</span><br><span class="line">       HelloImpl hello = cgLibProxy.getProxy(HelloImpl.class);</span><br><span class="line">       hello.say();</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">框架基础</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/框架基础//" class="article-tag-list-link color5">框架基础</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/20/动态代理/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-spring入门" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/17/spring入门/">spring入门</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/17/spring入门/" class="archive-article-date">
+  	<time datetime="2019-08-17T08:23:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="spring核心"><a href="#spring核心" class="headerlink" title="spring核心"></a>spring核心</h1><p>spring的核心是基于控制反转(IOC)的原理，Ioc是一种将组件依赖项的创建和管理外部化的技术，在运行时注入也叫做控制反转(DI)<br>spring的DI是基于接口和javaBean</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/spring//" class="article-tag-list-link color2">spring</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/17/spring入门/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-mybatis拦截器开发" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1042,196 +1236,6 @@
 
 
   
-    <article id="post-Stack源码分析" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/21/Stack源码分析/">Stack源码分析</a>
-    </h1>
-  
-
-        
-        <a href="/2019/06/21/Stack源码分析/" class="archive-article-date">
-  	<time datetime="2019-06-21T07:46:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Stack类是继承了Vector类的，所以它也是使用数组实现的，Stack类是线程安全的类<br>Stack类的源码其实比较简单，使用了栈类型的数据结构，有先进后出的特点</p>
-<h2 id="Push方法"><a href="#Push方法" class="headerlink" title="Push方法"></a>Push方法</h2><p>往栈顶添加元素</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public E push(E item) &#123;</span><br><span class="line">      addElement(item);</span><br><span class="line"></span><br><span class="line">      return item;</span><br><span class="line">  &#125;</span><br><span class="line">addElement调用的是父类Vector类的添加方法</span><br></pre></td></tr></table></figure>
-
-<h2 id="pop方法"><a href="#pop方法" class="headerlink" title="pop方法"></a>pop方法</h2><p>弹出栈顶元素，删除了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public synchronized E pop() &#123;</span><br><span class="line">     E       obj;</span><br><span class="line">     int     len = size();</span><br><span class="line"></span><br><span class="line">     obj = peek();</span><br><span class="line">     removeElementAt(len - 1);</span><br><span class="line"></span><br><span class="line">     return obj;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">     public synchronized E peek() &#123;</span><br><span class="line">     int     len = size();</span><br><span class="line"></span><br><span class="line">     if (len == 0)</span><br><span class="line">         throw new EmptyStackException();</span><br><span class="line">     return elementAt(len - 1);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> 可以看出是取数组下标最大值进行操作</span><br></pre></td></tr></table></figure>
-
-<h2 id="peek方法"><a href="#peek方法" class="headerlink" title="peek方法"></a>peek方法</h2><p>获取栈顶元素，不进行删除</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public synchronized E peek() &#123;</span><br><span class="line">       int     len = size();</span><br><span class="line"></span><br><span class="line">       if (len == 0)</span><br><span class="line">           throw new EmptyStackException();</span><br><span class="line">       return elementAt(len - 1);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">jdk源码分析</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/jdk源码分析//" class="article-tag-list-link color3">jdk源码分析</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/06/21/Stack源码分析/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-LinkedHashMap源码分析" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/21/LinkedHashMap源码分析/">LinkedHashMap源码分析</a>
-    </h1>
-  
-
-        
-        <a href="/2019/06/21/LinkedHashMap源码分析/" class="archive-article-date">
-  	<time datetime="2019-06-21T01:59:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="HashMap和LinkedHashMap的区别"><a href="#HashMap和LinkedHashMap的区别" class="headerlink" title="HashMap和LinkedHashMap的区别"></a>HashMap和LinkedHashMap的区别</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HashMap底层是用数组实现的，数组的特点是查询快，增删慢，访问的时候是无序的</span><br><span class="line">LinkedHashMap底层是用链表实现的，特点是查询慢，增删快，因为增加了before和after这两个属性，记录了顺序，访问的时候可以保证按插入的顺序进行访问</span><br></pre></td></tr></table></figure>
-
-<h2 id="put代码"><a href="#put代码" class="headerlink" title="put代码"></a>put代码</h2><p>LinkedHashMap是继承了HashMap的，使用put的使用完全是使用HashMap的put代码，但使用他重写了Entry里面的newNode方法，保证了双向链表的顺序</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Node&lt;K,V&gt; newNode(int hash, K key, V value, Node&lt;K,V&gt; e) &#123;</span><br><span class="line">    LinkedHashMap.Entry&lt;K,V&gt; p =</span><br><span class="line">        new LinkedHashMap.Entry&lt;K,V&gt;(hash, key, value, e);</span><br><span class="line">    linkNodeLast(p);</span><br><span class="line">    return p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> private void linkNodeLast(LinkedHashMap.Entry&lt;K,V&gt; p) &#123;</span><br><span class="line">    LinkedHashMap.Entry&lt;K,V&gt; last = tail;</span><br><span class="line">    tail = p;</span><br><span class="line">    if (last == null)</span><br><span class="line">        head = p;</span><br><span class="line">    else &#123;</span><br><span class="line">        p.before = last;</span><br><span class="line">        last.after = p;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>LinkedHashMap 拥有与 HashMap 相同的底层哈希表结构，即数组 + 单链表 + 红黑树，也拥有相同的扩容机制。</li>
-<li>LinkedHashMap 相比 HashMap 的拉链式存储结构，内部额外通过 Entry 维护了一个双向链表。</li>
-<li>HashMap 元素的遍历顺序不一定与元素的插入顺序相同，而 LinkedHashMap 则通过遍历双向链表来获取元素，所以遍历顺序在一定条件下等于插入顺序。</li>
-<li>LinkedHashMap 可以通过构造参数 accessOrder 来指定双向链表是否在元素被访问后改变其在双向链表中的位置。</li>
-</ol>
-<p><em>参考：<a href="https://juejin.im/post/5ace2bde6fb9a028e25deca8" target="_blank" rel="noopener">https://juejin.im/post/5ace2bde6fb9a028e25deca8</a></em></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">jdk源码分析</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/jdk源码分析//" class="article-tag-list-link color3">jdk源码分析</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/06/21/LinkedHashMap源码分析/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1337,7 +1341,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">杂记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">框架基础</a>
               </li>
              
               <li class="article-tag-list-item">
